@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-
 import java.awt.Color;
 import java.awt.Font;
 
@@ -24,8 +23,8 @@ import java.util.TimerTask;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
 public class MultiCast_Client {
-	private final static String NORMAL_IP = "239.0.0.1"; 
-	private final static String ADNETWORK_IP = "238.0.0.1"; 
+	private final static String NORMAL_IP = "239.0.0.1";
+	private final static String ADNETWORK_IP = "238.0.0.1";
 	private final static String PORT = "2000";
 	
 	private EmbeddedMediaPlayerComponent mediaPlayerComponent;
@@ -33,12 +32,12 @@ public class MultiCast_Client {
 	private boolean adnetwork_mode = true;
 	private JTextField timeCnt;
 	private JTextField info;
+	private JPanel controles;
 	private Button mode;
-	private int interval = 120; 
+	private int interval = 120;
 	int delay = 1000;
     int period = 1000;
 
-	// »ı¼ºÀÚ
 	private MultiCast_Client() throws Exception {
 		final JFrame frame = new JFrame("Cliente UDP");
 		frame.setLayout(new BorderLayout());
@@ -50,43 +49,42 @@ public class MultiCast_Client {
 		mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 		frame.add(mediaPlayerComponent, BorderLayout.CENTER);
 
-		JPanel controles = new JPanel();
+		controles = new JPanel();
 		controles.setLayout(new GridLayout());
 		frame.add(controles, BorderLayout.SOUTH);
 		
-		Font f = new Font("Verdana",Font.BOLD,30);
+		Font f = new Font("Verdana", Font.BOLD, 60);
 		
-		// Count ÇÊµå
+		info = new JTextField();
+		info.setText("ê°œì¸í™” ë°©ì†¡");
+		info.setFont(f);
+		info.setForeground(Color.red);
+		info.setHorizontalAlignment(JTextField.CENTER);
+		controles.add(info); 
+		// controles.invalidate();
+		
 		timeCnt = new JTextField();
 		timeCnt.setText("");
 		timeCnt.setFont(f);
 		timeCnt.setForeground(Color.red);
 		timeCnt.setHorizontalAlignment(JTextField.CENTER);
-		controles.add(timeCnt); 
-		info = new JTextField();
-		info.setText("CUE MODE");
-		info.setFont(f);
-		info.setForeground(Color.red);
+		// controles.add(timeCnt); 
 		
-		info.setHorizontalAlignment(JTextField.CENTER);
-		controles.add(info); 
-		
-		// Mode ¹öÆ°
-		mode = new Button("Å¥Åæ MODE OFF"); 
+		mode = new Button("CUE MODE OFF"); 
 		mode.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (adnetwork_mode) {
-					System.out.println("¾Öµå³×Æ®¿öÅ© ¸ğµå -> ÀÏ¹İ¸ğµå");
+					System.out.println("ì• ë“œë„¤íŠ¸ì›Œí¬-> ì¼ë°˜");
 					adnetwork_mode = false;
-					mode.setLabel("Å¥Åæ MODE ON");
-					info.setText("NORMAL MODE");
+					mode.setLabel("CUE MODE ON");
+					info.setText("ë³¸ë°©ì†¡");
 					info.setForeground(Color.green);
 				} else {
-					System.out.println("ÀÏ¹İ ¸ğµå -> ¾Öµå³×Æ®¿öÅ© ¸ğµå");
+					System.out.println("ì¼ë°˜-> ì• ë“œë„¤íŠ¸ì›Œí¬");
 					adnetwork_mode = true;
-					mode.setLabel("Å¥Åæ MODE OFF");
-					info.setText("CUE MODE");
+					mode.setLabel("CUE MODE OFF");
+					info.setText("ê°œì¸í™” ë°©ì†¡");
 					info.setForeground(Color.red);
 				}
 			}
@@ -94,21 +92,21 @@ public class MultiCast_Client {
 		mode.setFont(f);
 		controles.add(mode); 
 		
-		// ÀÏ¹İ¿µ»ó ¿äÃ» ¹× ¼ö½Å
-		mediaPlayerComponent.mediaPlayer().media().play("udp://@"+NORMAL_IP+":"+PORT);
+		if(mediaPlayerComponent.mediaPlayer().media().play("udp://@"+NORMAL_IP+":"+PORT)) {
+			time_set();
+		}
+		
 		sendGet("http://192.168.0.31:8086/api/get/1");
-		// Å¸ÀÌ¸Ó ÀÛµ¿
-		time_set();
 	}
 	
 	private void connect() {
 		String dir;
-		if(adnetwork_mode == false) { // ÀÏ¹İ ¸ğµå
-			System.out.println("ÀÏ¹İ ¸ğµå");
+		if(adnetwork_mode == false) {
+			System.out.println("ï¿½Ï¹ï¿½ ï¿½ï¿½ï¿½");
 			dir = "udp://@"+NORMAL_IP+":"+PORT;
 		}
-		else { // ¾Öµå³×Æ®¿öÅ© ¸ğµå
-			System.out.println("¾Öµå³×Æ®¿öÅ© ¸ğµå");
+		else {
+			System.out.println("ï¿½Öµï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½");
 			dir = "udp://@"+ADNETWORK_IP+":"+PORT;
 		}
 		mediaPlayerComponent.mediaPlayer().media().play(dir);
@@ -133,7 +131,6 @@ public class MultiCast_Client {
 		System.out.println("HTTP body : " + response.toString()); 
 	}
 
-	// Å¸ÀÌ¸Ó
 	private void time_set() { 
 		Timer time = new Timer();
 		
@@ -152,7 +149,6 @@ public class MultiCast_Client {
             	 }
             	 */
             	 if(interval == 30){
-            		 // ¾Öµå³×Æ®¿öÅ© ¸ğµçÀÎ °æ¿ì ¼ö½Å  (connect)
             		 if(adnetwork_mode == true) {
             			 connect();
             		 }
@@ -162,14 +158,14 @@ public class MultiCast_Client {
             		 if(adnetwork_mode == true) {
                 		 try {
                 			 sendGet("http://192.168.0.31:8086/api/get/1");
-     					 } catch (Exception e) {
-     						e.printStackTrace();
+     					 } catcprintStackTrace();
      					 }
                      }
-            	 }
+            	 }h (Exception e) {
+     						e.
             	 */
             	 else if (interval == 0) {
-            		// ¾Öµå³×Æ®¿öÅ© ¸ğµçÀÎ °æ¿ì ¼ö½Å  (connect)
+            		// ï¿½Öµï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½  (connect)
             		 if(adnetwork_mode == true) {
             			 adnetwork_mode = false;
             			 connect();
@@ -179,10 +175,14 @@ public class MultiCast_Client {
                      time.purge();
                  } 
                  if(interval > 30 && interval <= 35 ) {
-                	 // Ä«¿îÆ®´Ù¿î ¼¼±â
+                	 controles.add(timeCnt);
+                	 controles.validate();
+                	 
                 	 timeCnt.setText(interval - 30 + "");
                  }
                  else {
+                	 controles.remove(timeCnt);
+                	 controles.validate();
                 	 timeCnt.setText("");
                  }
                  
